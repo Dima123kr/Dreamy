@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 250px;
+}
+.btn-group {
+    margin-top: 20px;
+    margin-right: 20px;
+}
+.custom-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 0; /* Убираем отступ сверху */
+}
+.product-container {
+    max-height: 343px; /* Установить фиксированную высоту */
+    overflow-y: auto; /* Включить вертикальную прокрутку */
+    background-color: #f8f9fa; /* Чтобы контейнеры выглядели одинаково */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+</style>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <h1>{{current_user.get_data().first_name}} {{current_user.get_data().last_name}}</h1>
+                Почта: {{current_user.get_data().email}}<br>
+                {% if current_user.get_data().gender == "male" %}
+                    Пол: мужской
+                {% else %}
+                    Пол: женский
+                {% endif %}<br>
+                Дата рождения: {{current_user.get_data().date_of_birthday}}<br>
+                Дата создания аккаунта: {{current_user.get_data().date_of_creation}}<br>
+                <div class="btn-group">
+                    <a class="btn btn-outline-dark my-2 my-sm-0 btn-animated" href="/account/edit">Изменить</a>
+                    <a class="btn btn-outline-dark my-2 my-sm-0 btn-animated" href="/account/delete">Удалить</a>
+                    <a class="btn btn-outline-dark my-2 my-sm-0 btn-animated" href="/account/leave">Выйти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.js"></script>
+
+<br><br>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="custom-container">
+                <h1 align="center">Статистика</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="sleep_week"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="sleep_month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="sleep_start_week"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="sleep_start_month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="sleep_end_week"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="sleep_end_month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="condition_change_week"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="condition_change_month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="condition_before_week"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="condition_before_month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="condition_after_week"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="custom-container">
+                <div style="width: 400px;">
+                    <canvas id="condition_after_month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+<h1>{{ diary }}</h1>
+<div id="forloop" hidden>{{ diary }}</div>
+<script src="{{ url_for('static', filename='scripts/statistics.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.js"></script>
+<script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+
+{% endblock %}

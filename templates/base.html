@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_page.css') }}"> <!-- Подключаем файл стилей -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- Подключаем Bootstrap CSS -->
+</head>
+
+<body>
+    <div hidden>
+        {% set db_sess = db_session.create_session() %}
+        {% if current_user.is_authenticated %}
+            {% set current_user_login_data = current_user.get_login_data() %}
+            {% set current_user_data = current_user.get_data() %}
+            {{ db_sess.add(current_user_login_data) }}
+            {{ db_sess.add(current_user_data) }}
+        {% endif %}
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Dreamy</a>
+            {% if current_user.is_authenticated %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        {% if current_user.type == "buyer" %}
+                            <a class="nav-link custom-cart-btn" href="/cart">Корзина</a>
+                        {% elif current_user.type == "seller" %}
+                            <a class="nav-link custom-cart-btn" href="/add_product/start">Добавить товар</a>
+                        {% elif current_user.type == "admin" %}
+                            <a class="nav-link custom-cart-btn" href="/admin">Модерация</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link custom-account-btn" href="/account">{{ current_user_data.first_name }} {{ current_user_data.last_name }}</a>
+                    </li>
+                </ul>
+            {% else %}
+                <p>
+                    <a class="btn btn btn-outline-dark btn-animated" href="/register">Зарегистрироваться</a>
+                    <a class="btn btn btn-outline-dark btn-animated" href="/login">Войти</a>
+                </p>
+            {% endif %}
+        </div>
+    </nav>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothscroll/1.4.10/SmoothScroll.min.js" integrity="sha256-huW7yWl7tNfP7lGk46XE+Sp0nCotjzYodhVKlwaNeco=" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='scripts/scroll.js') }}"></script>
+
+    {% block content %}{% endblock %}
+
+    <div hidden>
+        {{ db_sess.close() }}
+    </div>
+</body>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 align="center">Дневник</h1>
+    <h2 align="center">{{ date }}</h2>
+    <br><br><br>
+    {% if is_completed %}
+    <h2 align="center">Сегодняшняя страница дневника уже заполнена</h2>
+    <br>
+    <center>
+    <a class="btn btn btn-outline-dark btn-animated" href="/">На главную</a>
+    </center>
+    {% else %}
+    <h3 align="center">Вводите данные о вашем сне ежедневно, чтобы мы могли давать вам более качественные и полезные советы.</h3>
+    <br>
+    <h3 align="center">Для получения более корректных показаний советуем вам заполнять дневник в середине дня.</h3>
+    <br>
+    <h3 align="center">После заполнения формы изменить данные будет нельзя.</h3>
+    <br>
+    <center>
+    <a class="btn btn btn-outline-dark btn-animated" href="/diary">Начать</a>
+    </center>
+    {% endif %}
+</div>
+{% endblock %}
