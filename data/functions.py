@@ -37,7 +37,6 @@ def new_user(first_name, last_name, email, password, gender, date_of_birthday, i
     db_sess.add(user_data)
     db_sess.add(user_login_data)
     db_sess.commit()
-    db_sess.close()
 
     return user, user_data, user_login_data
 

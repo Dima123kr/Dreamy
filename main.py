@@ -23,13 +23,12 @@ login_manager.init_app(app)
 def load_user(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
-    db_sess.close()
     return user
 
 
 @app.route('/')
 def main():
-    return render_template('main.html', title="Dreamy", db_session=db_session)
+    return render_template('main.html', title="Dreamy")
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -40,19 +39,18 @@ def register():
 
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация', form=form, message="Пароли не совпадают", db_session=db_session)
+            return render_template('register.html', title='Регистрация', form=form, message="Пароли не совпадают")
         if db_sess.query(UserData).filter(UserData.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация', form=form, message="Указанная почта занята", db_session=db_session)
+            return render_template('register.html', title='Регистрация', form=form, message="Указанная почта занята")
         if not 14 < datetime.date.today().year - form.date_of_birthday.data.year < 200:
-            return render_template('register.html', title='Регистрация', form=form, message="Недопустимый возраст", db_session=db_session)
+            return render_template('register.html', title='Регистрация', form=form, message="Недопустимый возраст")
         users = new_user(form.first_name.data, form.last_name.data, form.email.data, form.password.data, form.gender.data,
                         form.date_of_birthday.data)
         user = users[0]
         db_sess.add(user)
-        db_sess.close()
-        login_user(users[0])
+        login_user(user)
         return redirect('/')
-    return render_template('register.html', title='Регистрация', form=form, db_session=db_session)
+    return render_template('register.html', title='Регистрация', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -66,15 +64,12 @@ def login():
             if user.check_password:
                 user_ = db_sess.query(User).filter(User.uuid == user.uuid).first()
                 login_user(user_, remember=form.remember_me.data)
-                db_sess.close()
                 return redirect("/")
             else:
-                db_sess.close()
-                return render_template('login.html', message="Неправильный пароль", title='Авторизация', form=form, db_session=db_session)
+                return render_template('login.html', message="Неправильный пароль", title='Авторизация', form=form)
         else:
-            db_sess.close()
-            return render_template('login.html', message="Неправильный логин", title='Авторизация', form=form, db_session=db_session)
-    return render_template('login.html', title='Авторизация', form=form, db_session=db_session)
+            return render_template('login.html', message="Неправильный логин", title='Авторизация', form=form)
+    return render_template('login.html', title='Авторизация', form=form)
 
 
 @app.route('/account')
@@ -102,9 +97,9 @@ def edit_account():
         form.date_of_birthday.data = current_user.get_data().date_of_birthday
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('edit.html', title='Изменение аккаунта', form=form, message="Пароли не совпадают", db_session=db_session)
+            return render_template('edit.html', title='Изменение аккаунта', form=form, message="Пароли не совпадают")
         if not 14 < datetime.date.today().year - form.date_of_birthday.data.year < 200:
-            return render_template('edit.html', title='Изменение аккаунта', form=form, message="Недопустимый возраст", db_session=db_session)
+            return render_template('edit.html', title='Изменение аккаунта', form=form, message="Недопустимый возраст")
         db_sess = db_session.create_session()
         user_data = current_user.get_data(db_sess)
         user_login_data = current_user.get_login_data(db_sess)
@@ -118,9 +113,8 @@ def edit_account():
         db_sess.add(user_data)
         db_sess.add(user_login_data)
         db_sess.commit()
-        db_sess.close()
         return redirect('/account')
-    return render_template('edit.html', title='Изменение аккаунта', form=form, db_session=db_session)
+    return render_template('edit.html', title='Изменение аккаунта', form=form)
 
 
 @app.route('/account/delete')
@@ -134,7 +128,6 @@ def delete_account():
     db_sess.delete(user_data)
     db_sess.delete(user_login_data)
     db_sess.commit()
-    db_sess.close()
     return redirect('/')
 
 
@@ -150,8 +143,7 @@ def leave_account():
 def diary_start():
     db_sess = db_session.create_session()
     is_completed = len(db_sess.query(Diary).filter(Diary.day == datetime.date.today()).all()) > 0
-    db_sess.close()
-    return render_template('diary_start.html', date=datetime.date.today(), is_completed=is_completed, db_session=db_session)
+    return render_template('diary_start.html', date=datetime.date.today(), is_completed=is_completed)
 
 
 @app.route('/diary', methods=['GET', 'POST'])
@@ -170,14 +162,13 @@ def diary():
         db_sess = db_session.create_session()
         db_sess.add(diary)
         db_sess.commit()
-        db_sess.close()
         return redirect('/')
-    return render_template('diary.html', date=datetime.date.today(), form=form, db_session=db_session)
+    return render_template('diary.html', date=datetime.date.today(), form=form)
 
 
 @app.route('/beta', methods=['GET', 'POST'])
 def beta():
-    return render_template('beta.html', db_session=db_session)
+    return render_template('beta.html')
 
 
 if __name__ == "__main__":

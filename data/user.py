@@ -19,12 +19,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         if not db_sess:
             db_sess = db_session.create_session()
         user_login_data = db_sess.query(UserLoginData).get(self.uuid)
-        db_sess.close()
         return user_login_data
 
     def get_data(self, db_sess=None):
         if not db_sess:
             db_sess = db_session.create_session()
         user_data = db_sess.query(UserData).get(self.uuid)
-        db_sess.close()
         return user_data
