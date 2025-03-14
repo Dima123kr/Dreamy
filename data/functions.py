@@ -56,6 +56,5 @@ def new_diary(brief_notes, sleep_start, sleep_end, sleep_imagination, condition_
     db_sess = db_session.create_session()
     db_sess.add(diary)
     db_sess.commit()
-    db_sess.close()
 
     return diary

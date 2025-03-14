@@ -58,7 +58,7 @@ new Chart(ctx, {
                 day_3.toLocaleString("ru", options1),
                 day_2.toLocaleString("ru", options1),
                 day_1.toLocaleString("ru", options1),
-                day.toLocaleString("ru", options1)
+                day.toLocaleString("ru", options1),
                 ],
         datasets: [{
             label: 'Длительность сна, ч.',

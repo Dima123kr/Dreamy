@@ -1,6 +1,8 @@
 import datetime
 from flask import Flask, render_template, redirect, url_for, jsonify, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from psycopg2 import DATETIME
+
 from data import db_session
 from data.diary import Diary
 from data.user import User
@@ -74,10 +76,50 @@ def login():
 @app.route('/account')
 def account():
     db_sess = db_session.create_session()
-    diary = db_sess.query(Diary).filter(Diary.user == current_user.uuid).all()
+    diary = db_sess.query(Diary).filter(Diary.user == current_user.uuid and (datetime.date.today() - Diary.day).days <= 365).all()
+
+    week = list(reversed(list(filter(lambda x: (datetime.date.today() - x.day).days < 7, diary))))
+    week_sleep_length = []
+    week_sleep_start = []
+    week_sleep_end = []
+    week_condition_delta = []
+    week_condition_before = []
+    week_condition_after = []
+    for i in week:
+        if i.sleep_start > i.sleep_end:
+            week_sleep_length.append((datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) +
+                                     datetime.timedelta(0, 0, 0, 0, 0, 24) -
+                                     datetime.timedelta(0, 0, 0, 0, i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
+        else:
+            week_sleep_length.append((datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) -
+                                     datetime.timedelta(0, 0, 0, 0, i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
+        week_sleep_start.append(i.sleep_start.hour + i.sleep_start.minute / 60)
+        week_sleep_end.append(i.sleep_end.hour + i.sleep_end.minute / 60)
+        week_condition_delta.append(i.condition_after - i.condition_before)
+        week_condition_before.append(i.condition_before)
+        week_condition_after.append(i.condition_after)
+    print(week_sleep_length)
+    print(week_sleep_start)
+    print(week_sleep_end)
+    print(week_condition_delta)
+    print(week_condition_before)
+    print(week_condition_after)
+
+    month_now = datetime.date.today().month
+    year_now = datetime.date.today().year
+    months = []
+    months.append(list(filter(lambda x: x.day.month == month_now, diary)))
+    for i in range(month_now - 1):
+        months.append(list(filter(lambda x: x.day.month == month_now - i - 1 and year_now == x.day.year, diary)))
+    for i in range(12 - month_now):
+        months.append(list(filter(lambda x: x.day.month == 12 - i and year_now - 1 == x.day.year, diary)))
+    months = list(reversed(months))
+    print(months)
+
     diary_ = []
     for i in diary:
-        diary_.append(f"{i.day} {i.sleep_start} {i.sleep_end} {i.condition_before} {i.condition_after}")
+        if (datetime.date.today() - i.day).days <= 365:
+            diary_.append(f"{i.day} {i.sleep_start} {i.sleep_end} {i.condition_before} {i.condition_after}")
     diary_ = ",".join(diary_)
     return render_template('account.html', db_session=db_session, diary=diary_)
 
