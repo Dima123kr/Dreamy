@@ -107,8 +107,7 @@ def account():
 
     month_now = datetime.date.today().month
     year_now = datetime.date.today().year
-    months = []
-    months.append(list(filter(lambda x: x.day.month == month_now, diary)))
+    months = [list(filter(lambda x: x.day.month == month_now, diary))]
     for i in range(month_now - 1):
         months.append(list(filter(lambda x: x.day.month == month_now - i - 1 and year_now == x.day.year, diary)))
     for i in range(12 - month_now):
@@ -205,11 +204,6 @@ def diary():
         db_sess.commit()
         return redirect('/')
     return render_template('diary.html', date=datetime.date.today(), form=form)
-
-
-@app.route('/beta', methods=['GET', 'POST'])
-def beta():
-    return render_template('beta.html')
 
 
 if __name__ == "__main__":
