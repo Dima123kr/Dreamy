@@ -1,4 +1,9 @@
-var str = document.getElementById("forloop").innerHTML;
+var str = document.getElementById("forloop").innerHTML.split(",");
+var values = new Array(str.length);
+for (var i = 0; i < str.length; i++)
+{
+    values[i] = str[i].split(" ");
+}
 
 var day = new Date();
 var day_1 = new Date();
@@ -62,7 +67,15 @@ new Chart(ctx, {
                 ],
         datasets: [{
             label: 'Длительность сна, ч.',
-            data: [12, 19, 3, 5, 2, 3, 5],
+            data: [
+                parseFloat(values[0][0]),
+                parseFloat(values[0][1]),
+                parseFloat(values[0][2]),
+                parseFloat(values[0][3]),
+                parseFloat(values[0][4]),
+                parseFloat(values[0][5]),
+                parseFloat(values[0][6])
+                ],
             borderWidth: 1
         }]
     },
@@ -96,7 +109,20 @@ new Chart(ctx2, {
                 ],
         datasets: [{
             label: 'Длительность сна, ч.',
-            data: [12, 19, 3, 5, 2, 3, 3, 12, 30, 22, 11, 28],
+            data: [
+                parseFloat(values[1][0]),
+                parseFloat(values[1][1]),
+                parseFloat(values[1][2]),
+                parseFloat(values[1][3]),
+                parseFloat(values[1][4]),
+                parseFloat(values[1][5]),
+                parseFloat(values[1][6]),
+                parseFloat(values[1][7]),
+                parseFloat(values[1][8]),
+                parseFloat(values[1][9]),
+                parseFloat(values[1][10]),
+                parseFloat(values[1][11]),
+                ],
             borderWidth: 1
         }]
     },
@@ -125,7 +151,15 @@ new Chart(ctx3, {
                 ],
         datasets: [{
             label: 'Время начала сна',
-            data: [12, 19, 3, 5, 2, 3, 5],
+            data: [
+                parseFloat(values[2][0]),
+                parseFloat(values[2][1]),
+                parseFloat(values[2][2]),
+                parseFloat(values[2][3]),
+                parseFloat(values[2][4]),
+                parseFloat(values[2][5]),
+                parseFloat(values[2][6])
+                ],
             borderWidth: 1
         }]
     },
@@ -159,7 +193,20 @@ new Chart(ctx4, {
                 ],
         datasets: [{
             label: 'Время начала сна',
-            data: [12, 19, 3, 5, 2, 3, 3, 12, 30, 22, 11, 28],
+            data: [
+                parseFloat(values[3][0]),
+                parseFloat(values[3][1]),
+                parseFloat(values[3][2]),
+                parseFloat(values[3][3]),
+                parseFloat(values[3][4]),
+                parseFloat(values[3][5]),
+                parseFloat(values[3][6]),
+                parseFloat(values[3][7]),
+                parseFloat(values[3][8]),
+                parseFloat(values[3][9]),
+                parseFloat(values[3][10]),
+                parseFloat(values[3][11]),
+                ],
             borderWidth: 1
         }]
     },
@@ -188,7 +235,15 @@ new Chart(ctx5, {
                 ],
         datasets: [{
             label: 'Время окончания сна',
-            data: [12, 19, 3, 5, 2, 3, 5],
+            data: [
+                parseFloat(values[4][0]),
+                parseFloat(values[4][1]),
+                parseFloat(values[4][2]),
+                parseFloat(values[4][3]),
+                parseFloat(values[4][4]),
+                parseFloat(values[4][5]),
+                parseFloat(values[4][6])
+                ],
             borderWidth: 1
         }]
     },
@@ -222,7 +277,20 @@ new Chart(ctx6, {
                 ],
         datasets: [{
             label: 'Время окончания сна',
-            data: [12, 19, 3, 5, 2, 3, 3, 12, 30, 22, 11, 28],
+            data: [
+                parseFloat(values[5][0]),
+                parseFloat(values[5][1]),
+                parseFloat(values[5][2]),
+                parseFloat(values[5][3]),
+                parseFloat(values[5][4]),
+                parseFloat(values[5][5]),
+                parseFloat(values[5][6]),
+                parseFloat(values[5][7]),
+                parseFloat(values[5][8]),
+                parseFloat(values[5][9]),
+                parseFloat(values[5][10]),
+                parseFloat(values[5][11]),
+                ],
             borderWidth: 1
         }]
     },
@@ -251,7 +319,15 @@ new Chart(ctx7, {
                 ],
         datasets: [{
             label: 'Изменение состояния во время сна',
-            data: [12, 19, 3, 5, 2, 3, 5],
+            data: [
+                parseFloat(values[6][0]),
+                parseFloat(values[6][1]),
+                parseFloat(values[6][2]),
+                parseFloat(values[6][3]),
+                parseFloat(values[6][4]),
+                parseFloat(values[6][5]),
+                parseFloat(values[6][6])
+                ],
             borderWidth: 1
         }]
     },
@@ -285,7 +361,20 @@ new Chart(ctx8, {
                 ],
         datasets: [{
             label: 'Изменение состояния во время сна',
-            data: [12, 19, 3, 5, 2, 3, 3, 12, 30, 22, 11, 28],
+            data: [
+                parseFloat(values[7][0]),
+                parseFloat(values[7][1]),
+                parseFloat(values[7][2]),
+                parseFloat(values[7][3]),
+                parseFloat(values[7][4]),
+                parseFloat(values[7][5]),
+                parseFloat(values[7][6]),
+                parseFloat(values[7][7]),
+                parseFloat(values[7][8]),
+                parseFloat(values[7][9]),
+                parseFloat(values[7][10]),
+                parseFloat(values[7][11]),
+                ],
             borderWidth: 1
         }]
     },
@@ -314,7 +403,15 @@ new Chart(ctx9, {
                 ],
         datasets: [{
             label: 'Оценка состояния перед сном',
-            data: [12, 19, 3, 5, 2, 3, 5],
+            data: [
+                parseFloat(values[8][0]),
+                parseFloat(values[8][1]),
+                parseFloat(values[8][2]),
+                parseFloat(values[8][3]),
+                parseFloat(values[8][4]),
+                parseFloat(values[8][5]),
+                parseFloat(values[8][6])
+                ],
             borderWidth: 1
         }]
     },
@@ -348,7 +445,20 @@ new Chart(ctx10, {
                 ],
         datasets: [{
             label: 'Оценка состояния перед сном',
-            data: [12, 19, 3, 5, 2, 3, 3, 12, 30, 22, 11, 28],
+            data: [
+                parseFloat(values[9][0]),
+                parseFloat(values[9][1]),
+                parseFloat(values[9][2]),
+                parseFloat(values[9][3]),
+                parseFloat(values[9][4]),
+                parseFloat(values[9][5]),
+                parseFloat(values[9][6]),
+                parseFloat(values[9][7]),
+                parseFloat(values[9][8]),
+                parseFloat(values[9][9]),
+                parseFloat(values[9][10]),
+                parseFloat(values[9][11]),
+                ],
             borderWidth: 1
         }]
     },
@@ -377,7 +487,15 @@ new Chart(ctx11, {
                 ],
         datasets: [{
             label: 'Оценка состояния после сна',
-            data: [12, 19, 3, 5, 2, 3, 5],
+            data: [
+                parseFloat(values[10][0]),
+                parseFloat(values[10][1]),
+                parseFloat(values[10][2]),
+                parseFloat(values[10][3]),
+                parseFloat(values[10][4]),
+                parseFloat(values[10][5]),
+                parseFloat(values[10][6])
+                ],
             borderWidth: 1
         }]
     },
@@ -411,7 +529,20 @@ new Chart(ctx12, {
                 ],
         datasets: [{
             label: 'Оценка состояния после сна',
-            data: [12, 19, 3, 5, 2, 3, 3, 12, 30, 22, 11, 28],
+            data: [
+                parseFloat(values[11][0]),
+                parseFloat(values[11][1]),
+                parseFloat(values[11][2]),
+                parseFloat(values[11][3]),
+                parseFloat(values[11][4]),
+                parseFloat(values[11][5]),
+                parseFloat(values[11][6]),
+                parseFloat(values[11][7]),
+                parseFloat(values[11][8]),
+                parseFloat(values[11][9]),
+                parseFloat(values[11][10]),
+                parseFloat(values[11][11]),
+                ],
             borderWidth: 1
         }]
     },
