@@ -1,8 +1,6 @@
 import datetime
 from flask import Flask, render_template, redirect, url_for, jsonify, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from psycopg2 import DATETIME
-
 from data import db_session
 from data.diary import Diary
 from data.user import User
@@ -78,18 +76,23 @@ def account():
     db_sess = db_session.create_session()
     diary = db_sess.query(Diary).filter(Diary.user == current_user.uuid and (datetime.date.today() - Diary.day).days <= 365).all()
 
-    week = list(reversed(list(filter(lambda x: (datetime.date.today() - x.day).days < 7, diary))))
     day_now = datetime.date.today().day
     month_now = datetime.date.today().month
     year_now = datetime.date.today().year
-    days = [list(filter(lambda x: x.day == datetime.date.today(), diary))[0]]
+    day1 = list(filter(lambda x: x.day == datetime.date.today(), diary))
+    if len(day1) == 0:
+        day1 = [None]
+    days = [day1[0]]
     if day_now >= 7:
         day_now_ = 7
     else:
         day_now_ = day_now
     for i in range(day_now_):
-        days.append(list(filter(lambda x: x.day.day == day_now - i and x.day.month == month_now and
-                                          x.day.year == year_now, diary))[0])
+        day = list(filter(lambda x: x.day.day == day_now - i and x.day.month == month_now and
+                                          x.day.year == year_now, diary))
+        if len(day) == 0:
+            day = [None]
+        days.append(day[0])
     if month_now == 3:
         if year_now % 4 == 0:
             new_day = 29
@@ -104,8 +107,11 @@ def account():
     else:
         new_year = 0
     for i in range(7 - day_now_):
-        days.append(list(filter(lambda x: x.day.day == new_day - i and x.day.month == month_now - 1 and
-                                          x.day.year == year_now - new_year, diary))[0])
+        day = list(filter(lambda x: x.day.day == new_day - i and x.day.month == month_now - 1 and
+                                          x.day.year == year_now - new_year, diary))
+        if len(day) == 0:
+            day = [None]
+        days.append(day[0])
     days = list(reversed(days))
     day_sleep_length = []
     day_sleep_start = []
@@ -114,6 +120,14 @@ def account():
     day_condition_before = []
     day_condition_after = []
     for i in days:
+        if not i:
+            day_sleep_start.append(0)
+            day_sleep_end.append(0)
+            day_condition_delta.append(0)
+            day_condition_before.append(0)
+            day_condition_after.append(0)
+            day_sleep_length.append(0)
+            continue
         if i.sleep_start > i.sleep_end:
             day_sleep_length.append((datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) +
                                      datetime.timedelta(0, 0, 0, 0, 0, 24) -

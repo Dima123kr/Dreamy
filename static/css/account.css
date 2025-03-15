@@ -1,0 +1,24 @@
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 250px;
+}
+.btn-group {
+    margin-top: 20px;
+    margin-right: 20px;
+}
+.custom-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+}
+.product-container {
+    max-height: 343px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

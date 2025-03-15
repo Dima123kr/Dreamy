@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 <div class="container">
     <h1 align="center">Дневник</h1>
     <h2 align="center">{{ date }}</h2>
