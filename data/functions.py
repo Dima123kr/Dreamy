@@ -62,41 +62,43 @@ def new_diary(brief_notes, sleep_start, sleep_end, sleep_imagination, condition_
 
 
 def new_message(message, user=current_user):
-    from main import client
-    db_sess = db_session.create_session()
-    messages_db = db_sess.query(Message).filter(Message.user == user.uuid).all()
-    messages = []
-    for i in messages_db:
-        if i.is_gpt:
-            role = "assistant"
-        else:
-            role = "user"
+    if len(message.strip(" ")) != 0:
+        from main import client
+        db_sess = db_session.create_session()
+        messages_db = db_sess.query(Message).filter(Message.user == user.uuid).all()
+        messages = []
+        for i in messages_db:
+            if i.is_gpt:
+                role = "assistant"
+            else:
+                role = "user"
+            messages.append({
+                "role": role,
+                "content": i.message
+            })
         messages.append({
-            "role": role,
-            "content": i.message
+            "role": "user",
+            "content": message
         })
-    messages.append({
-        "role": "user",
-        "content": message
-    })
-    chat_completion = client.chat.completions.create(
-        messages=messages,
-        model="gpt-4o-mini",
-    )
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model="gpt-4o-mini",
+        )
 
-    message_db1 = Message()
-    message_db1.user = user.uuid
-    message_db1.is_gpt = False
-    message_db1.message = message
+        message_db1 = Message()
+        message_db1.user = user.uuid
+        message_db1.is_gpt = False
+        message_db1.message = message
 
-    message_db2 = Message()
-    message_db2.user = user.uuid
-    message_db2.is_gpt = True
-    message_db2.message = chat_completion.choices[0].message.content
+        message_db2 = Message()
+        message_db2.user = user.uuid
+        message_db2.is_gpt = True
+        message_db2.message = chat_completion.choices[0].message.content
 
-    db_sess = db_session.create_session()
-    db_sess.add(message_db1)
-    db_sess.add(message_db2)
-    db_sess.commit()
+        db_sess = db_session.create_session()
+        db_sess.add(message_db1)
+        db_sess.add(message_db2)
+        db_sess.commit()
 
-    return message_db1, message_db2
+        return message_db1, message_db2
+    return
