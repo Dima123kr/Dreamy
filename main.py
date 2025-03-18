@@ -297,7 +297,14 @@ def diary():
 @login_required
 def chat_gpt():
     if request.method == "POST":
-        new_message(request.form["message"])
+        try:
+            new_message(request.form["message"])
+        except Exception as err:
+            db_sess = db_session.create_session()
+            messages = db_sess.query(Message).filter(Message.user == current_user.uuid).all()
+            for i in messages:
+                db_sess.delete(i)
+            db_sess.commit()
     db_sess = db_session.create_session()
     messages = db_sess.query(Message).filter(Message.user == current_user.uuid).all()
     return render_template('chat_gpt.html', title="ChatGPT", messages=messages)
