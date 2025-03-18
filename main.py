@@ -269,7 +269,7 @@ def leave_account():
 @login_required
 def diary_start():
     db_sess = db_session.create_session()
-    is_completed = len(db_sess.query(Diary).filter(Diary.day == datetime.date.today()).all()) > 0
+    is_completed = len(db_sess.query(Diary).filter(Diary.day == datetime.date.today() and Diary.user == current_user).all()) > 0
     return render_template('diary_start.html', date=datetime.date.today(), is_completed=is_completed)
 
 
