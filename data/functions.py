@@ -3,6 +3,7 @@ from data.diary import Diary
 from data.user import User
 from data.user_data import UserData
 from data.user_login_data import UserLoginData
+from data.message import Message
 import uuid
 from flask_login import current_user
 from data import db_session
@@ -58,3 +59,44 @@ def new_diary(brief_notes, sleep_start, sleep_end, sleep_imagination, condition_
     db_sess.commit()
 
     return diary
+
+
+def new_message(message, user=current_user):
+    from main import client
+    db_sess = db_session.create_session()
+    messages_db = db_sess.query(Message).filter(Message.user == user.uuid).all()
+    messages = []
+    for i in messages_db:
+        if i.is_gpt:
+            role = "assistant"
+        else:
+            role = "user"
+        messages.append({
+            "role": role,
+            "content": i.message
+        })
+    messages.append({
+        "role": "user",
+        "content": message
+    })
+    chat_completion = client.chat.completions.create(
+        messages=messages,
+        model="gpt-4o-mini",
+    )
+
+    message_db1 = Message()
+    message_db1.user = user.uuid
+    message_db1.is_gpt = False
+    message_db1.message = message
+
+    message_db2 = Message()
+    message_db2.user = user.uuid
+    message_db2.is_gpt = True
+    message_db2.message = chat_completion.choices[0].message.content
+
+    db_sess = db_session.create_session()
+    db_sess.add(message_db1)
+    db_sess.add(message_db2)
+    db_sess.commit()
+
+    return message_db1, message_db2

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat_gpt.css') }}">
+<div class="box">
+    {% for i in messages %}
+        {% if i.is_gpt == True %}
+            <div class="person-a">
+                <div class="icon"></div>
+                <div class="message">{{ i.message }}</div>
+            </div>
+        {% else %}
+            <div class="person-b">
+                <div class="message">{{ i.message }}</div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    <br>
+    <form action="" method="post">
+        <div class="form">
+            <input type="text" id="chatgpt" name="message" class="form-control" placeholder="Сообщение">
+        </div>
+        <button type="submit" >
+            <img src="static/photos/send.png" alt="Отправить" width="35" height="35">
+        </button>
+    </form>
+</div>
+
+{% endblock %}

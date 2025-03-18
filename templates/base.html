@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
@@ -12,24 +13,19 @@
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             <a class="navbar-brand" href="/">Dreamy</a>
-            <a class="btn btn btn-outline-dark btn-animated ml-auto" href="/diary_start">Дневник</a>
+            <p class="navbar-nav ml-auto">
+                <a class="btn btn btn-outline-dark btn-animated ml-auto" href="/diary_start">Дневник</a>
+                &nbsp&nbsp&nbsp&nbsp&nbsp
+                <a class="btn btn btn-outline-dark btn-animated ml-auto" href="/chat_gpt">ChatGPT</a>
+            </p>
             {% if current_user.is_authenticated %}
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        {% if current_user.type == "buyer" %}
-                            <a class="nav-link custom-cart-btn" href="/cart">Корзина</a>
-                        {% elif current_user.type == "seller" %}
-                            <a class="nav-link custom-cart-btn" href="/add_product/start">Добавить товар</a>
-                        {% elif current_user.type == "admin" %}
-                            <a class="nav-link custom-cart-btn" href="/admin">Модерация</a>
-                        {% endif %}
-                    </li>
-                    <li class="nav-item">
+                <div class="navbar-nav ml-auto">
+                    <div class="nav-item">
                         <a class="nav-link custom-account-btn" href="/account">{{ current_user.get_data().first_name }} {{ current_user.get_data().last_name }}</a>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             {% else %}
-                <p>
+                <p class="navbar-nav ml-auto">
                     <a class="btn btn btn-outline-dark btn-animated" href="/register">Зарегистрироваться</a>
                     <a class="btn btn btn-outline-dark btn-animated" href="/login">Войти</a>
                 </p>
@@ -42,3 +38,63 @@
 
     {% block content %}{% endblock %}
 </body>
+
+<footer class="footer py-5">
+	<hr color="#8b00ff" style="height: 4px">
+    <div class="container">
+		<div class="container mt-5">
+			<div class="row">
+				<div class="col-md-4">
+					<div class="custom-container">
+						<div style="width: 400px;">
+							<h5>Контакты</h5>
+							<br>
+                			<a>Email №1: krivosheya_da@mail.ru</a>
+							<br>
+							<a>Email №2: krivosheya.da2@gmail.com</a>
+							<br>
+                            <br>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="custom-container">
+						<div style="width: 400px;">
+							<h5>Полезные ссылки</h5>
+							<a href="/">Главная</a>
+							<br>
+							<a href="/account">Аккаунт</a>
+							<br>
+							<a href="/diary_start">Дневник</a>
+                            <br>
+							<a href="/chat_gpt">ChatGPT</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="custom-container">
+						<div style="width: 400px;">
+							<h5>Поддержать нас</h5>
+							<br>
+                			<a href="https://www.donationalerts.com/r/dima123kr">https://www.donationalerts.com</a>
+                            <br>
+							<br>
+							<br>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="container mt-5">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="custom-container">
+						<center>
+							<a>&copy; 2024-2025 Dreamy company. Все права защищены.</a>
+						</center>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</footer>

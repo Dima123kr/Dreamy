@@ -6,16 +6,23 @@ from data.diary import Diary
 from data.user import User
 from data.user_data import UserData
 from data.user_login_data import UserLoginData
+from data.message import Message
 from forms.register import RegisterForm
 from forms.login import LoginForm
 from forms.edit import EditForm
 from forms.diary import DiaryForm
-from data.functions import new_user, new_diary
+from data.functions import new_user, new_diary, new_message
+from openai import OpenAI
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'skjdgbrsgbntrsgkrnstrbnrstuiggbnrukitgghkutghearkghsejkvbseuyrsbgmfbv'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+client = OpenAI(
+    api_key="sk-xt9RThws4bABz9WdAh8NuKg6m5ujRrEm",
+    base_url="https://api.proxyapi.ru/openai/v1"
+)
 
 
 @login_manager.user_loader
@@ -129,12 +136,17 @@ def account():
             day_sleep_length.append(0)
             continue
         if i.sleep_start > i.sleep_end:
-            day_sleep_length.append((datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) +
-                                     datetime.timedelta(0, 0, 0, 0, 0, 24) -
-                                     datetime.timedelta(0, 0, 0, 0, i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
+            day_sleep_length.append(
+                (datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) +
+                 datetime.timedelta(0, 0, 0, 0, 0, 24) -
+                 datetime.timedelta(0, 0, 0, 0,
+                                    i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
         else:
-            day_sleep_length.append((datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) -
-                                     datetime.timedelta(0, 0, 0, 0, i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
+            day_sleep_length.append(
+                (datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) -
+                 datetime.timedelta(0, 0, 0, 0,
+                                    i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
+
         day_sleep_start.append(i.sleep_start.hour + i.sleep_start.minute / 60)
         day_sleep_end.append(i.sleep_end.hour + i.sleep_end.minute / 60)
         day_condition_delta.append(i.condition_after - i.condition_before)
@@ -279,6 +291,16 @@ def diary():
         db_sess.commit()
         return redirect('/')
     return render_template('diary.html', date=datetime.date.today(), form=form)
+
+
+@app.route('/chat_gpt', methods=['GET', 'POST'])
+@login_required
+def chat_gpt():
+    if request.method == "POST":
+        new_message(request.form["message"])
+    db_sess = db_session.create_session()
+    messages = db_sess.query(Message).filter(Message.user == current_user.uuid).all()
+    return render_template('chat_gpt.html', title="ChatGPT", messages=messages)
 
 
 if __name__ == "__main__":
