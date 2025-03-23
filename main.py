@@ -67,7 +67,7 @@ def login():
         db_sess = db_session.create_session()
         user = db_sess.query(UserLoginData).filter(UserLoginData.email == form.email.data).first()
         if user:
-            if user.check_password:
+            if user.check_password(form.password.data):
                 user_ = db_sess.query(User).filter(User.uuid == user.uuid).first()
                 login_user(user_, remember=form.remember_me.data)
                 return redirect("/")
