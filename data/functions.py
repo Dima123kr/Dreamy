@@ -82,7 +82,7 @@ def new_message(message, user=current_user):
         })
         chat_completion = client.chat.completions.create(
             messages=messages,
-            model="gpt-4o-mini",
+            model="gpt-4o",
         )
 
         message_db1 = Message()
