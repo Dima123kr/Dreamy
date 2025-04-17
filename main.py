@@ -265,17 +265,20 @@ def leave_account():
     return redirect('/')
 
 
-@app.route('/diary_start')
+@app.route("/diary_start")
 @login_required
 def diary_start():
     db_sess = db_session.create_session()
-    is_completed = len(db_sess.query(Diary).filter(Diary.day == datetime.date.today() and Diary.user == current_user).all()) > 0
-    return render_template('diary_start.html', date=datetime.date.today(), is_completed=is_completed)
+    is_completed = len(db_sess.query(Diary).filter(Diary.day == datetime.date.today(), Diary.user == current_user.uuid).all()) > 0
+    return render_template("diary_start.html", date=datetime.date.today(), is_completed=is_completed)
 
 
-@app.route('/diary', methods=['GET', 'POST'])
+@app.route("/diary", methods=["GET", "POST"])
 @login_required
 def diary():
+    db_sess = db_session.create_session()
+    if len(db_sess.query(Diary).filter(Diary.day == datetime.date.today(), Diary.user == current_user.uuid).all()) > 0:
+        return redirect("/")
     form = DiaryForm()
     if form.validate_on_submit():
         diary = new_diary(
@@ -289,8 +292,8 @@ def diary():
         db_sess = db_session.create_session()
         db_sess.add(diary)
         db_sess.commit()
-        return redirect('/')
-    return render_template('diary.html', date=datetime.date.today(), form=form)
+        return redirect("/")
+    return render_template("diary.html", date=datetime.date.today(), form=form)
 
 
 @app.route('/chat_gpt', methods=['GET', 'POST'])
@@ -307,7 +310,7 @@ def chat_gpt():
             db_sess.commit()
     db_sess = db_session.create_session()
     messages = db_sess.query(Message).filter(Message.user == current_user.uuid).all()
-    return render_template('chat_gpt.html', title="ChatGPT", messages=messages)
+    return render_template("chat_gpt.html", title="ChatGPT", messages=messages)
 
 
 if __name__ == "__main__":
