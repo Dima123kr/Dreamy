@@ -13,6 +13,7 @@ from forms.edit import EditForm
 from forms.diary import DiaryForm
 from data.functions import new_user, new_diary, new_message
 from openai import OpenAI
+import markdown
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'skjdgbrsgbntrsgkrnstrbnrstuiggbnrukitgghkutghearkghsejkvbseuyrsbgmfbv'
@@ -270,7 +271,12 @@ def leave_account():
 def diary_start():
     db_sess = db_session.create_session()
     is_completed = len(db_sess.query(Diary).filter(Diary.day == datetime.date.today(), Diary.user == current_user.uuid).all()) > 0
-    return render_template("diary_start.html", date=datetime.date.today(), is_completed=is_completed)
+    if is_completed:
+        db_sess = db_session.create_session()
+        diary = db_sess.query(Diary).filter(Diary.user == current_user.uuid, Diary.day == datetime.date.today()).first()
+        return render_template("diary_start.html", date=datetime.date.today(), is_completed=is_completed, diary=diary)
+    else:
+        return render_template("diary_start.html", date=datetime.date.today(), is_completed=is_completed)
 
 
 @app.route("/diary", methods=["GET", "POST"])
@@ -281,18 +287,42 @@ def diary():
         return redirect("/")
     form = DiaryForm()
     if form.validate_on_submit():
+        message = f'''
+            Привет, представь, что ты эксперт по сну и тебе надо дать развернутый комментарий по сну, дать несколько 
+            персональных советов, опираясь на следующую анкету:
+            краткие заметки по сну: {form.brief_notes.data};
+            время начала сна: {form.sleep_start.data};
+            время окончания сна: {form.sleep_end.data};
+            что приснилось: {form.sleep_imagination.data};
+            как себя чувствовал перед сном от 1 до 10: {form.condition_before.data};
+            как себя чувствовал после сна от 1 до 10: {form.condition_after.data}.
+            После каждого блока со списком обязательно вставь какой нибудь текст.
+        '''
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": message
+                }
+            ],
+            model="gpt-4o",
+        )
+        result = chat_completion.choices[0].message.content
+        result = markdown.markdown(result)
+
         diary = new_diary(
             form.brief_notes.data,
             form.sleep_start.data,
             form.sleep_end.data,
             form.sleep_imagination.data,
             form.condition_before.data,
-            form.condition_after.data
+            form.condition_after.data,
+            result
         )
         db_sess = db_session.create_session()
         db_sess.add(diary)
         db_sess.commit()
-        return redirect("/")
+        return redirect("/diary_start")
     return render_template("diary.html", date=datetime.date.today(), form=form)
 
 

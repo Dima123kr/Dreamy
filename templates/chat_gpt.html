@@ -8,11 +8,11 @@
         {% if i.is_gpt == True %}
             <div class="person-a">
                 <div class="icon"></div>
-                <div class="message">{{ i.message }}</div>
+                <div class="message">{{ i.message | safe }}</div>
             </div>
         {% else %}
             <div class="person-b">
-                <div class="message">{{ i.message }}</div>
+                <div class="message">{{ i.message | safe }}</div>
             </div>
         {% endif %}
     {% endfor %}

@@ -7,7 +7,11 @@
     <h2 align="center">{{ date }}</h2>
     <br><br><br>
     {% if is_completed %}
-    <h2 align="center">Сегодняшняя страница дневника уже заполнена</h2>
+    <h1 align="center">Сегодняшняя страница дневника уже заполнена</h1>
+    <br>
+    <h2 align="center">Ниже приведен ваши персональные рекомендации по улучшению качества сна</h2>
+    <br>
+    <div>{{ diary.result | safe }}</div>
     <br>
     <center>
     <a class="btn btn btn-outline-dark btn-animated" href="/">На главную</a>

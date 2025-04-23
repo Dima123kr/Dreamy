@@ -7,6 +7,7 @@ from data.message import Message
 import uuid
 from flask_login import current_user
 from data import db_session
+import markdown
 
 
 def new_user(first_name, last_name, email, password, gender, date_of_birthday, is_admin=False, is_boss=False):
@@ -42,7 +43,7 @@ def new_user(first_name, last_name, email, password, gender, date_of_birthday, i
     return user, user_data, user_login_data
 
 
-def new_diary(brief_notes, sleep_start, sleep_end, sleep_imagination, condition_before, condition_after,
+def new_diary(brief_notes, sleep_start, sleep_end, sleep_imagination, condition_before, condition_after, result,
               user=current_user, day=datetime.date.today()):
     diary = Diary()
     diary.user = user.uuid
@@ -53,6 +54,7 @@ def new_diary(brief_notes, sleep_start, sleep_end, sleep_imagination, condition_
     diary.sleep_imagination = sleep_imagination
     diary.condition_before = condition_before
     diary.condition_after = condition_after
+    diary.result = result
 
     db_sess = db_session.create_session()
     db_sess.add(diary)
@@ -84,6 +86,8 @@ def new_message(message, user=current_user):
             messages=messages,
             model="gpt-4o",
         )
+        result = chat_completion.choices[0].message.content
+        result = markdown.markdown(result)
 
         message_db1 = Message()
         message_db1.user = user.uuid
@@ -93,7 +97,7 @@ def new_message(message, user=current_user):
         message_db2 = Message()
         message_db2.user = user.uuid
         message_db2.is_gpt = True
-        message_db2.message = chat_completion.choices[0].message.content
+        message_db2.message = result
 
         db_sess = db_session.create_session()
         db_sess.add(message_db1)
@@ -101,4 +105,4 @@ def new_message(message, user=current_user):
         db_sess.commit()
 
         return message_db1, message_db2
-    return
+    return None

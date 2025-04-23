@@ -23,3 +23,4 @@ class Diary(SqlAlchemyBase, SerializerMixin):
     sleep_imagination = sqlalchemy.Column(sqlalchemy.Text)
     condition_before = sqlalchemy.Column(sqlalchemy.Integer)
     condition_after = sqlalchemy.Column(sqlalchemy.Integer)
+    result = sqlalchemy.Column(sqlalchemy.Text)
