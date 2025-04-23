@@ -11,7 +11,7 @@ from forms.register import RegisterForm
 from forms.login import LoginForm
 from forms.edit import EditForm
 from forms.diary import DiaryForm
-from data.functions import new_user, new_diary, new_message
+from data.functions import new_user, new_diary, new_message, get_statistics
 from openai import OpenAI
 import markdown
 
@@ -81,132 +81,14 @@ def login():
 
 @app.route('/account')
 def account():
-    db_sess = db_session.create_session()
-    diary = db_sess.query(Diary).filter(Diary.user == current_user.uuid and (datetime.date.today() - Diary.day).days <= 365).all()
-
-    day_now = datetime.date.today().day
-    month_now = datetime.date.today().month
-    year_now = datetime.date.today().year
-    day1 = list(filter(lambda x: x.day == datetime.date.today(), diary))
-    if len(day1) == 0:
-        day1 = [None]
-    days = [day1[0]]
-    if day_now >= 7:
-        day_now_ = 7
-    else:
-        day_now_ = day_now
-    for i in range(day_now_):
-        day = list(filter(lambda x: x.day.day == day_now - i and x.day.month == month_now and
-                                          x.day.year == year_now, diary))
-        if len(day) == 0:
-            day = [None]
-        days.append(day[0])
-    if month_now == 3:
-        if year_now % 4 == 0:
-            new_day = 29
-        else:
-            new_day = 28
-    elif month_now in [2, 4, 6, 8, 9, 11, 1]:
-            new_day = 31
-    else:
-        new_day = 30
-    if month_now == 1:
-        new_year = 1
-    else:
-        new_year = 0
-    for i in range(7 - day_now_):
-        day = list(filter(lambda x: x.day.day == new_day - i and x.day.month == month_now - 1 and
-                                          x.day.year == year_now - new_year, diary))
-        if len(day) == 0:
-            day = [None]
-        days.append(day[0])
-    days = list(reversed(days))
-    day_sleep_length = []
-    day_sleep_start = []
-    day_sleep_end = []
-    day_condition_delta = []
-    day_condition_before = []
-    day_condition_after = []
-    for i in days:
-        if not i:
-            day_sleep_start.append(0)
-            day_sleep_end.append(0)
-            day_condition_delta.append(0)
-            day_condition_before.append(0)
-            day_condition_after.append(0)
-            day_sleep_length.append(0)
-            continue
-        if i.sleep_start > i.sleep_end:
-            day_sleep_length.append(
-                (datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) +
-                 datetime.timedelta(0, 0, 0, 0, 0, 24) -
-                 datetime.timedelta(0, 0, 0, 0,
-                                    i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
-        else:
-            day_sleep_length.append(
-                (datetime.timedelta(0, 0, 0, 0, i.sleep_end.minute, i.sleep_end.hour) -
-                 datetime.timedelta(0, 0, 0, 0,
-                                    i.sleep_start.minute, i.sleep_start.hour)).seconds / 3600)
-
-        day_sleep_start.append(i.sleep_start.hour + i.sleep_start.minute / 60)
-        day_sleep_end.append(i.sleep_end.hour + i.sleep_end.minute / 60)
-        day_condition_delta.append(i.condition_after - i.condition_before)
-        day_condition_before.append(i.condition_before)
-        day_condition_after.append(i.condition_after)
-
-    month_now = datetime.date.today().month
-    year_now = datetime.date.today().year
-    months = [list(filter(lambda x: x.day.month == month_now, diary))]
-    for i in range(month_now - 1):
-        months.append(list(filter(lambda x: x.day.month == month_now - i - 1 and year_now == x.day.year, diary)))
-    for i in range(12 - month_now):
-        months.append(list(filter(lambda x: x.day.month == 12 - i and year_now - 1 == x.day.year, diary)))
-    months = list(reversed(months))
-    month_sleep_length = []
-    month_sleep_start = []
-    month_sleep_end = []
-    month_condition_delta = []
-    month_condition_before = []
-    month_condition_after = []
-    for i in months:
-        if len(i) == 0:
-            month_sleep_start.append(0)
-            month_sleep_end.append(0)
-            month_condition_delta.append(0)
-            month_condition_before.append(0)
-            month_condition_after.append(0)
-            month_sleep_length.append(0)
-            continue
-        sleep_start_list = []
-        sleep_end_list = []
-        condition_before_list = []
-        condition_after_list = []
-        for n in i:
-            sleep_start_list.append(datetime.timedelta(0, 0, 0, 0, n.sleep_start.minute, n.sleep_start.hour).seconds / 3600)
-            sleep_end_list.append(datetime.timedelta(0, 0, 0, 0, n.sleep_end.minute, n.sleep_end.hour).seconds / 3600)
-            condition_before_list.append(n.condition_before)
-            condition_after_list.append(n.condition_after)
-        sleep_start = sum(sleep_start_list) / len(sleep_start_list)
-        sleep_end = sum(sleep_end_list) / len(sleep_end_list)
-        condition_before = sum(condition_before_list) / len(condition_before_list)
-        condition_after = sum(condition_after_list) / len(condition_after_list)
-        if sleep_start > sleep_end:
-            month_sleep_length.append(sleep_end + 24 - sleep_start)
-        else:
-            month_sleep_length.append(sleep_end - sleep_start)
-        month_sleep_start.append(sleep_start)
-        month_sleep_end.append(sleep_end)
-        month_condition_delta.append(condition_after - condition_before)
-        month_condition_before.append(condition_before)
-        month_condition_after.append(condition_after)
-
+    diary_ = get_statistics()
     diary_ = [
-        " ".join(list(map(str, day_sleep_length))),     " ".join(list(map(str, month_sleep_length))),
-        " ".join(list(map(str, day_sleep_start))),      " ".join(list(map(str, month_sleep_start))),
-        " ".join(list(map(str, day_sleep_end))),        " ".join(list(map(str, month_sleep_end))),
-        " ".join(list(map(str, day_condition_delta))),  " ".join(list(map(str, month_condition_delta))),
-        " ".join(list(map(str, day_condition_before))), " ".join(list(map(str, month_condition_before))),
-        " ".join(list(map(str, day_condition_after))),  " ".join(list(map(str, month_condition_after)))
+        " ".join(list(map(str, diary_[0]))), " ".join(list(map(str, diary_[1]))),
+        " ".join(list(map(str, diary_[2]))), " ".join(list(map(str, diary_[3]))),
+        " ".join(list(map(str, diary_[4]))), " ".join(list(map(str, diary_[5]))),
+        " ".join(list(map(str, diary_[6]))), " ".join(list(map(str, diary_[7]))),
+        " ".join(list(map(str, diary_[8]))), " ".join(list(map(str, diary_[9]))),
+        " ".join(list(map(str, diary_[10]))), " ".join(list(map(str, diary_[11])))
     ]
     return render_template('account.html', db_session=db_session, diary=",".join(diary_))
 
@@ -319,7 +201,43 @@ def diary():
             form.condition_after.data,
             result
         )
-        db_sess = db_session.create_session()
+
+        diary_ = get_statistics()
+        message = f'''
+                    Привет, представь, что ты эксперт по сну и тебе надо дать развернутый комментарий по сну, дать 
+                    несколько персональных советов, опираясь на следующие данные о сне за последнюю неделю по формату 
+                    "Критерий-6 дней назад;5 дней назад;4 дня назад;3 дня назад;2 дня назад;1 день назад;сегодня.":
+                    Начало сна-23:00;22:00;00:00;01:00;02:00;23:00;21:00.
+                    Окончание сна-07:00;08:00;07:00;06:00;07:00;07:00;12:00.
+                    Оценка состояния перед сном от 1 до 10-5;6;7;4;8;1;2.
+                    Оценка состояния после сна от 1 до 10-9;8;9;1;7;9;10.
+                    Также необходимо учесть средние данные за последние 12 месяцев(данные будут введены по формату 
+                    "Критерий-11 месяцев назад;10 месяцев назад;9 месяцев назад;8 месяцев назад;7 месяцев назад;
+                    6 месяцев назад;5 месяцев назад;4 месяца назад;3 месяца назад;2 месяца назад;1 месяц назад;
+                    этот месяц."):
+                    Начало сна-23:00;22:00;00:00;01:00;02:00;23:00;21:00;23:00;22:00;00:00;01:00;02:00.
+                    Окончание сна-07:00;08:00;07:00;06:00;07:00;07:00;12:00;08:00;07:00;06:00;07:00;07:00.
+                    Оценка состояния перед сном от 1 до 10-5;6;7;4;8;1;2;5;6;7;4;8.
+                    Оценка состояния после сна от 1 до 10-9;8;9;1;7;9;10;9;1;7;9;10.
+                    Также важно учесть то, что некоторые значения, равные нулю могут оказаться просто 
+                    незаполненными полями.
+                    Весь итоговый ответ по объему должен быть меньше 1000 слов.
+                '''
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": message
+                }
+            ],
+            model="gpt-4o",
+        )
+        result = chat_completion.choices[0].message.content
+        result = markdown.markdown(result)
+        user_data = db_sess.query(UserData).filter(UserData.uuid == current_user.uuid).first()
+        user_data.recommendation = result
+
+        db_sess.add(user_data)
         db_sess.add(diary)
         db_sess.commit()
         return redirect("/diary_start")

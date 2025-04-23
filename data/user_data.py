@@ -19,3 +19,4 @@ class UserData(SqlAlchemyBase, SerializerMixin):
     is_admin = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     is_boss = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     date_of_creation = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    recommendation = sqlalchemy.Column(sqlalchemy.String)

@@ -29,7 +29,29 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.js"></script>
 
-<br><br>
+<br><br><br><br>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="custom-container">
+                <h1 align="center">Персональные рекомендации по улучшению качества сна</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="custom-container">
+                <p>{{ current_user.get_data().recommendation | safe }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br><br><br>
 
 <div class="container mt-5">
     <div class="row">
