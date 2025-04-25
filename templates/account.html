@@ -45,7 +45,11 @@
     <div class="row">
         <div class="col-md-10">
             <div class="custom-container">
-                <p>{{ current_user.get_data().recommendation | safe }}</p>
+                {% if current_user.get_data().recommendation %}
+                    <p>{{ current_user.get_data().recommendation | safe }}</p>
+                {% else %}
+                    <p>Недостаточно данных для генерирования персональных рекомендаций</p>
+                {% endif %}
             </div>
         </div>
     </div>
